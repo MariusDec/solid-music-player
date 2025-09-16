@@ -1,34 +1,50 @@
-import { createSignal } from 'solid-js';
-import viteLogo from '/vite.svg';
-import solidLogo from './assets/solid.svg';
-import './App.css';
+import { createSignal } from "solid-js";
+import logo from "./assets/logo.svg";
+import { invoke } from "@tauri-apps/api/core";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = createSignal(0);
+  const [greetMsg, setGreetMsg] = createSignal("");
+  const [name, setName] = createSignal("");
+
+  async function greet() {
+    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+    setGreetMsg(await invoke("greet", { name: name() }));
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank" rel="noopener">
-          <img src={viteLogo} class="logo" alt="Vite logo" />
+    <main class="container">
+      <h1>Welcome to Tauri + Solid</h1>
+
+      <div class="row">
+        <a href="https://vitejs.dev" target="_blank">
+          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
         </a>
-        <a href="https://solidjs.com" target="_blank" rel="noopener">
-          <img src={solidLogo} class="logo solid" alt="Solid logo" />
+        <a href="https://tauri.app" target="_blank">
+          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
+        </a>
+        <a href="https://solidjs.com" target="_blank">
+          <img src={logo} class="logo solid" alt="Solid logo" />
         </a>
       </div>
-      <h1>Vite + Solid</h1>
-      <div class="card">
-        <button type="button" onClick={() => setCount((count) => count + 1)}>
-          count is {count()}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p class="read-the-docs">
-        Click on the Vite and Solid logos to learn more
-      </p>
-    </>
+      <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
+
+      <form
+        class="row"
+        onSubmit={(e) => {
+          e.preventDefault();
+          greet();
+        }}
+      >
+        <input
+          id="greet-input"
+          onChange={(e) => setName(e.currentTarget.value)}
+          placeholder="Enter a name..."
+        />
+        <button type="submit">Greet</button>
+      </form>
+      <p>{greetMsg()}</p>
+    </main>
   );
 }
 
